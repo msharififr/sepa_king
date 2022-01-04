@@ -24,8 +24,8 @@ module SEPA
           builder.PmtInfId("#{message_identification}/#{transactions.index(transaction)+1}")
           builder.PmtMtd('TRF')
           builder.BtchBookg(transaction.batch_booking)
-          builder.NbOfTxs(transactions.length)
-          builder.CtrlSum('%.2f' % amount_total(transactions))
+          builder.NbOfTxs(1)
+          builder.CtrlSum('%.2f' % transaction.amount)
           builder.PmtTpInf do
             if transaction.service_level
               builder.SvcLvl do
