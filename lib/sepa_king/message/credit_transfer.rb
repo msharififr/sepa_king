@@ -19,27 +19,26 @@ module SEPA
 
     def build_payment_informations(builder)
       # Build a PmtInf block for every group of transactions
-      grouped_transactions.each do |group, transactions|
-        # All transactions with the same requested_date are placed into the same PmtInf block
+      transactions.each do |transaction|
         builder.PmtInf do
-          builder.PmtInfId(payment_information_identification(group))
+          builder.PmtInfId("#{message_identification}/#{transactions.index(transaction)+1}")
           builder.PmtMtd('TRF')
-          builder.BtchBookg(group[:batch_booking])
-          builder.NbOfTxs(transactions.length)
-          builder.CtrlSum('%.2f' % amount_total(transactions))
+          builder.BtchBookg(transaction.batch_booking)
+          builder.NbOfTxs(1)
+          builder.CtrlSum('%.2f' % transaction.amount)
           builder.PmtTpInf do
-            if group[:service_level]
+            if transaction.service_level
               builder.SvcLvl do
-                builder.Cd(group[:service_level])
+                builder.Cd(transaction.service_level)
               end
             end
-            if group[:category_purpose]
+            if transaction.category_purpose
               builder.CtgyPurp do
-                builder.Cd(group[:category_purpose])
+                builder.Cd(transaction.category_purpose)
               end
             end
           end
-          builder.ReqdExctnDt(group[:requested_date].iso8601)
+          builder.ReqdExctnDt(transaction.requested_date.iso8601)
           builder.Dbtr do
             builder.Nm(account.name)
           end
@@ -59,13 +58,11 @@ module SEPA
               end
             end
           end
-          if group[:service_level]
+          if transaction.service_level
             builder.ChrgBr('SLEV')
           end
 
-          transactions.each do |transaction|
-            build_transaction(builder, transaction)
-          end
+          build_transaction(builder, transaction)
         end
       end
     end
