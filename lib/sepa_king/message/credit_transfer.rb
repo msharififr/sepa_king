@@ -62,9 +62,7 @@ module SEPA
             builder.ChrgBr('SLEV')
           end
 
-          transactions.each do |transaction|
-            build_transaction(builder, transaction)
-          end
+          build_transaction(builder, transaction)
         end
       end
     end
